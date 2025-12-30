@@ -3,62 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cozy Pomodoro</title>
+    <title>Cozy Pomodoro Timer</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <script src="script.js" defer></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="language-toggle">
-        <img src="language-icon.png" alt="Language" onclick="toggleLanguage()">
+    <header class="header">
+    <div class="top-left-controls">
+        <button class="control-button language-toggle" onclick="toggleLanguage()" title="Переключить язык">
+            🌐
+        </button>
+        <button class="control-button theme-toggle" onclick="toggleTheme()" id="themeButton">
+            🌙
+        </button>
     </div>
-    <div class="hero">
-        <h1 id="title">Помодоро Таймер</h1>
-        <p id="subtitle">Управляйте своим временем и работайте продуктивнее!</p>
-        <div class="actions">
-            <a href="#timer" class="button" id="startTimer">Запустить Таймер</a>
-            <a href="#settings" class="button" id="settingsButton">Настройки</a>
-        </div>
-    </div>
+</header>
 
-    <div class="container" id="timer">
-        <h1 id="timerTitle">Таймер Помодоро</h1>
-        <div class="timer">
-            <span id="time">25:00</span>
-        </div>
-        <button id="setTimer25" onclick="setTimer(25)">25 мин (Обычная)</button>
-        <button id="setTimer5" onclick="setTimer(5)">5 мин (Короткая)</button>
-        <button id="setTimer15" onclick="setTimer(15)">15 мин (Длинная)</button>
-        <button style="background-color: #ff5c8d; color: white" id="start" onclick="startTimer()">Начать</button>
-        <button style="background-color: #d64d76; color: white" id="reset" onclick="resetTimer()">Сбросить</button>
-        <div class="settings">
-            <label id="sessionLengthLabel" for="sessionLength">Длительность сессии (мин.):</label>
-            <input type="number" id="sessionLength" value="25" min="1" max="60">
-        </div>
-    </div>
+    <main class="main-container">
+        <section class="hero">
+            <h1 id="title">Помодоро Таймер</h1>
+            <p id="subtitle">Управляйте своим временем и работайте продуктивнее!</p>
+        </section>
 
-    <div class="tasks-container">
-        <h2 id="tasksTitle">Задачи</h2>
-        <input type="text" id="newTask" placeholder="Добавить задачу">
-        <button onclick="addTask()" id="addTaskButton">Добавить</button>
-        <ul id="taskList"></ul>
-    </div>
+        <section class="timer-section container">
+            <h2 id="timerTitle">Таймер Помодоро</h2>
+            <div class="timer-wrapper">
+                <svg class="progress-ring" viewBox="0 0 300 300">
+                    <circle class="progress-ring__circle-bg" cx="150" cy="150" r="140"/>
+                    <circle class="progress-ring__circle" cx="150" cy="150" r="140"/>
+                </svg>
+                <div class="timer-display" id="time">25:00</div>
+            </div>
+            <div class="preset-buttons">
+                <button onclick="setTimer(25)" id="setTimer25">25 мин (Стандарт)</button>
+                <button onclick="setTimer(5)" id="setTimer5">5 мин (Короткий перерыв)</button>
+                <button onclick="setTimer(15)" id="setTimer15">15 мин (Длинный перерыв)</button>
+            </div>
+            <div class="controls">
+                <button id="start" class="primary-button">Начать</button>
+                <button id="reset">Сбросить</button>
+            </div>
+            <div class="custom-session">
+                <label id="sessionLengthLabel">Кастомная длительность (мин):</label>
+                <input type="number" id="sessionLength" value="25" min="1" max="120">
+            </div>
+        </section>
 
-    <div class="settings-container" id="settings">
-        <h1 id="settingsTitle">Настройки Таймера</h1>
-        <form id="settings-form">
-            <label id="bgColorLabel" for="bgColor">Цвет фона:</label>
-            <input type="color" id="bgColor" name="bgColor">
+        <section class="tasks-section container">
+            <h2 id="tasksTitle">Задачи</h2>
+            <div class="task-input">
+                <input type="text" id="newTask" placeholder="Добавить задачу">
+                <button onclick="addTask()" id="addTaskButton">Добавить</button>
+            </div>
+            <ul id="taskList"></ul>
+        </section>
+    </main>
 
-            <label id="bgImageLabel" for="bgImage">Фоновое изображение (URL):</label>
-            <input type="text" id="bgImage" name="bgImage" placeholder="https://example.com/image.jpg">
-
-            <button id="applySettings" type="button" onclick="applySettings()">Применить</button>
-        </form>
-    </div>
+    <audio id="completionSound" src="assets/audio/completion.mp3" preload="auto"></audio>
 </body>
 </html>

@@ -1,145 +1,240 @@
 let currentLanguage = localStorage.getItem('language') || 'ru';
+let currentTheme = localStorage.getItem('theme') || 'light';
 
 const translations = {
-    'ru': {
+    ru: {
         title: 'Помодоро Таймер',
         subtitle: 'Управляйте своим временем и работайте продуктивнее!',
-        startTimer: 'Запустить Таймер',
-        settingsButton: 'Настройки',
         timerTitle: 'Таймер Помодоро',
         tasksTitle: 'Задачи',
-        addTaskButton: 'Добавить',
-        settingsTitle: 'Настройки Таймера',
-        setTimer25: '25 минут (Обычная)',
-        setTimer5: '5 минут (Короткая пауза)',
-        setTimer15: '15 минут (Длинная пауза)',
-        sessionLengthLabel: 'Длительность сессии:',
+        setTimer25: '25 мин (Стандарт)',
+        setTimer5: '5 мин (Короткий перерыв)',
+        setTimer15: '15 мин (Длинный перерыв)',
         addTaskPlaceholder: 'Добавить задачу',
+        addTaskButton: 'Добавить',
+        sessionLengthLabel: 'Кастомная длительность (мин):',
         start: 'Начать',
-        reset: 'Сбросить',
-        bgColorLabel: 'Цвет фона:',
-        bgImageLabel: 'Фоновое изображение (URL):',
-        applySettings: 'Применить'
+        reset: 'Сбросить'
     },
-    'en': {
+    en: {
         title: 'Pomodoro Timer',
-        sessionLengthLabel: 'Session Length:',
         subtitle: 'Manage your time and work more productively!',
-        startTimer: 'Start Timer',
-        settingsButton: 'Settings',
         timerTitle: 'Pomodoro Timer',
         tasksTitle: 'Tasks',
-        addTaskButton: 'Add',
-        addTaskPlaceholder: 'Add task',
-        settingsTitle: 'Timer Settings',
         setTimer25: '25 min (Standard)',
         setTimer5: '5 min (Short Break)',
         setTimer15: '15 min (Long Break)',
+        addTaskPlaceholder: 'Add task',
+        addTaskButton: 'Add',
+        sessionLengthLabel: 'Custom duration (min):',
         start: 'Start',
-        reset: 'Reset',
-        bgColorLabel: 'Background Color:',
-        bgImageLabel: 'Background Image (URL):',
-        applySettings: 'Apply'
+        reset: 'Reset'
     }
 };
 
 function toggleLanguage() {
-    currentLanguage = (currentLanguage === 'ru') ? 'en' : 'ru';
-
+    currentLanguage = currentLanguage === 'ru' ? 'en' : 'ru';
     localStorage.setItem('language', currentLanguage);
-
     updateText();
 }
 
+function toggleTheme() {
+    currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+    localStorage.setItem('theme', currentTheme);
+    document.body.classList.toggle('dark', currentTheme === 'dark');
+    document.getElementById('themeButton').textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+}
+
 function updateText() {
-    document.getElementById('title').innerText = translations[currentLanguage].title;
-    document.getElementById('subtitle').innerText = translations[currentLanguage].subtitle;
-    document.getElementById('startTimer').innerText = translations[currentLanguage].startTimer;
-    document.getElementById('settingsButton').innerText = translations[currentLanguage].settingsButton;
-    document.getElementById('timerTitle').innerText = translations[currentLanguage].timerTitle;
-    document.getElementById('tasksTitle').innerText = translations[currentLanguage].tasksTitle;
-    document.getElementById('addTaskButton').innerText = translations[currentLanguage].addTaskButton;
-    document.getElementById('settingsTitle').innerText = translations[currentLanguage].settingsTitle;
-    document.getElementById('setTimer25').innerText = translations[currentLanguage].setTimer25;
-    document.getElementById('setTimer5').innerText = translations[currentLanguage].setTimer5;
-    document.getElementById('setTimer15').innerText = translations[currentLanguage].setTimer15;
-    document.getElementById('newTask').placeholder = translations[currentLanguage].addTaskPlaceholder;
-    document.getElementById('sessionLengthLabel').innerText = translations[currentLanguage].sessionLengthLabel;
-    document.getElementById('start').innerText = translations[currentLanguage].start;
-    document.getElementById('reset').innerText = translations[currentLanguage].reset;
-    document.getElementById('bgColorLabel').innerText = translations[currentLanguage].bgColorLabel;
-    document.getElementById('bgImageLabel').innerText = translations[currentLanguage].bgImageLabel;
-    document.getElementById('applySettings').innerText = translations[currentLanguage].applySettings;
+    const t = translations[currentLanguage];
+    document.getElementById('title').innerText = t.title;
+    document.getElementById('subtitle').innerText = t.subtitle;
+    document.getElementById('timerTitle').innerText = t.timerTitle;
+    document.getElementById('tasksTitle').innerText = t.tasksTitle;
+    document.getElementById('setTimer25').innerText = t.setTimer25;
+    document.getElementById('setTimer5').innerText = t.setTimer5;
+    document.getElementById('setTimer15').innerText = t.setTimer15;
+    document.getElementById('newTask').placeholder = t.addTaskPlaceholder;
+    document.getElementById('addTaskButton').innerText = t.addTaskButton;
+    document.getElementById('sessionLengthLabel').innerText = t.sessionLengthLabel;
+    document.getElementById('start').innerText = t.start;
+    document.getElementById('reset').innerText = t.reset;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     updateText();
+    document.body.classList.toggle('dark', currentTheme === 'dark');
+    document.getElementById('themeButton').textContent = currentTheme === 'dark' ? '☀️' : '🌙';
 
-    const buttonClickSound = new Audio('assets/audio/click.mp3');
-    buttonClickSound.volume = 0.1;
+    if (Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
 
-    document.querySelectorAll('button, a.button').forEach(button => {
-        button.addEventListener('click', () => {
-            buttonClickSound.currentTime = 0;
-            buttonClickSound.play();
+    const clickSound = new Audio('assets/audio/click.mp3');
+    clickSound.volume = 0.1;
+    document.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            clickSound.currentTime = 0;
+            clickSound.play();
         });
     });
 
+    const completionSound = document.getElementById('completionSound');
+
     let timer;
     let isRunning = false;
-    let timeLeft = 1500;
+    let timeLeft = 25 * 60;
+    let totalTime = timeLeft;
 
     const timeDisplay = document.getElementById('time');
+    const progressCircle = document.querySelector('.progress-ring__circle');
     const startButton = document.getElementById('start');
     const resetButton = document.getElementById('reset');
     const sessionLengthInput = document.getElementById('sessionLength');
 
+    const circumference = 880;
+
+    // Ключ для хранения состояния таймера
+    const TIMER_STORAGE_KEY = 'pomodoroTimerState';
+
     function updateTimeDisplay() {
-        if (!timeDisplay) return;
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        timeDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+        const seconds = (timeLeft % 60).toString().padStart(2, '0');
+        timeDisplay.textContent = `${minutes}:${seconds}`;
+    }
+
+    function updateProgress() {
+        const offset = circumference - (circumference * (timeLeft / totalTime));
+        progressCircle.style.strokeDashoffset = offset;
+    }
+
+    function saveTimerState() {
+        const state = {
+            timeLeft,
+            totalTime,
+            isRunning,
+            customMinutes: sessionLengthInput.value || Math.round(totalTime / 60)
+        };
+        localStorage.setItem(TIMER_STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function loadTimerState() {
+        const saved = localStorage.getItem(TIMER_STORAGE_KEY);
+        if (!saved) return false;
+
+        try {
+            const state = JSON.parse(saved);
+            timeLeft = state.timeLeft ?? 25 * 60;
+            totalTime = state.totalTime ?? timeLeft;
+            isRunning = state.isRunning ?? false;
+            if (state.customMinutes) {
+                sessionLengthInput.value = state.customMinutes;
+            }
+            updateTimeDisplay();
+            updateProgress();
+            startButton.textContent = isRunning 
+                ? (currentLanguage === 'ru' ? 'Пауза' : 'Pause') 
+                : translations[currentLanguage].start;
+
+            if (isRunning) {
+                startTimerInternal();
+            }
+            return true;
+        } catch (e) {
+            console.error('Failed to load timer state', e);
+            return false;
+        }
+    }
+
+    function clearTimerState() {
+        localStorage.removeItem(TIMER_STORAGE_KEY);
     }
 
     function setTimer(minutes) {
+        sessionLengthInput.value = minutes;
         timeLeft = minutes * 60;
+        totalTime = timeLeft;
         updateTimeDisplay();
+        updateProgress();
+        saveTimerState();
     }
 
-    function startTimer() {
-        if (!isRunning) {
-            isRunning = true;
-            timer = setInterval(() => {
-                if (timeLeft > 0) {
-                    timeLeft--;
-                    updateTimeDisplay();
-                } else {
-                    clearInterval(timer);
-                    isRunning = false;
-                    alert("Сессия завершена!");
+    function startTimerInternal() {
+        isRunning = true;
+        startButton.textContent = currentLanguage === 'ru' ? 'Пауза' : 'Pause';
+        saveTimerState();
+
+        timer = setInterval(() => {
+            if (timeLeft > 0) {
+                timeLeft--;
+                updateTimeDisplay();
+                updateProgress();
+                saveTimerState();
+            } else {
+                clearInterval(timer);
+                isRunning = false;
+                startButton.textContent = translations[currentLanguage].start;
+                completionSound.play();
+                alert(currentLanguage === 'ru' ? 'Сессия завершена!' : 'Session completed!');
+                if (Notification.permission === 'granted') {
+                    new Notification('Pomodoro', { 
+                        body: currentLanguage === 'ru' ? 'Время сессии истекло!' : 'Time is up!' 
+                    });
                 }
-            }, 1000);
+                clearTimerState();
+            }
+        }, 1000);
+    }
+
+    function togglePause() {
+        if (isRunning) {
+            clearInterval(timer);
+            isRunning = false;
+            startButton.textContent = translations[currentLanguage].start;
+            saveTimerState();
+        } else {
+            startTimerInternal();
         }
     }
 
     function resetTimer() {
         clearInterval(timer);
         isRunning = false;
-        timeLeft = Number(sessionLengthInput.value) * 60 || 1500;
+        startButton.textContent = translations[currentLanguage].start;
+
+        const customMin = Number(sessionLengthInput.value);
+        const minutes = isNaN(customMin) || customMin <= 0 ? 25 : customMin;
+        sessionLengthInput.value = minutes;
+
+        timeLeft = minutes * 60;
+        totalTime = timeLeft;
         updateTimeDisplay();
+        updateProgress();
+        saveTimerState();
     }
 
-    if (startButton) startButton.addEventListener('click', startTimer);
-    if (resetButton) resetButton.addEventListener('click', resetTimer);
+    startButton.addEventListener('click', togglePause);
+    resetButton.addEventListener('click', resetTimer);
 
     window.setTimer = setTimer;
+    updateTimeDisplay();
+    updateProgress();
+
+    // Загрузка состояния таймера
+    loadTimerState();
+
+    // Если состояние не было загружено — устанавливаем значения по умолчанию
+    if (!localStorage.getItem(TIMER_STORAGE_KEY)) {
+        sessionLengthInput.value = 25;
+        setTimer(25);
+    }
 
     const taskInput = document.getElementById('newTask');
     const taskList = document.getElementById('taskList');
 
     function loadTasks() {
-        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-        taskList.innerHTML = "";
+        const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+        taskList.innerHTML = '';
         tasks.forEach(task => addTaskToDOM(task));
     }
 
@@ -149,71 +244,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
-        checkbox.classList.add('task-checkbox');
         checkbox.addEventListener('change', () => {
-            if (checkbox.checked) {
-                li.classList.add('completed');
-            } else {
-                li.classList.remove('completed');
-            }
-            if (checkbox.checked) {
-                removeTask(task);
-            }
+            span.classList.toggle('completed', checkbox.checked);
+            if (checkbox.checked) removeTask(task);
         });
 
         const span = document.createElement('span');
         span.textContent = task;
-        span.classList.add('task-text');
 
-        const deleteButton = document.createElement('button');
-        deleteButton.innerHTML = 'Удалить';
-        deleteButton.classList.add('delete-button');
-        deleteButton.addEventListener('click', () => {
-            removeTask(task);
-        });
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '✕';
+        deleteBtn.classList.add('delete-button');
+        deleteBtn.addEventListener('click', () => removeTask(task));
 
         li.appendChild(checkbox);
         li.appendChild(span);
-        li.appendChild(deleteButton);
+        li.appendChild(deleteBtn);
         taskList.appendChild(li);
     }
 
     function addTask() {
-        const taskText = taskInput.value.trim();
-        if (taskText) {
-            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-            tasks.push(taskText);
+        const text = taskInput.value.trim();
+        if (text) {
+            const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+            tasks.push(text);
             localStorage.setItem('tasks', JSON.stringify(tasks));
-            addTaskToDOM(taskText);
-            taskInput.value = "";
+            addTaskToDOM(text);
+            taskInput.value = '';
         }
     }
 
     function removeTask(taskToRemove) {
-        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-        const updatedTasks = tasks.filter(task => task !== taskToRemove);
-        localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+        let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+        tasks = tasks.filter(t => t !== taskToRemove);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
         loadTasks();
     }
 
-    document.querySelector("button[onclick='addTask()']").addEventListener("click", addTask);
+    document.getElementById('addTaskButton').addEventListener('click', addTask);
+    taskInput.addEventListener('keypress', e => {
+        if (e.key === 'Enter') addTask();
+    });
 
     loadTasks();
 });
-
-function applySettings() {
-    const bgColor = document.getElementById('bgColor').value;
-    const bgImage = document.getElementById('bgImage').value;
-
-    if (bgColor) {
-        document.body.style.backgroundColor = bgColor;
-    }
-
-    if (bgImage) {
-        document.body.style.backgroundImage = `url('${bgImage}')`;
-        document.body.style.backgroundSize = 'cover';
-        document.body.style.backgroundPosition = 'center';
-    }
-}
-
-window.applySettings = applySettings;
