@@ -1,11 +1,14 @@
 # ⭐ Main & Welcome page
-![Screenshot 2025-02-23 111039](https://github.com/user-attachments/assets/f4639c1b-05bb-4caa-ae52-c45bbda7f998)
+<img width="1876" height="907" alt="Screenshot 2025-12-31 020237" src="https://github.com/user-attachments/assets/1966c91a-b935-4f5c-89a5-1f2e74e1db7e" />
 
 # ⏲️ Timer & Tasks
-![Screenshot 2025-02-23 111057](https://github.com/user-attachments/assets/62c9d851-e273-4f3c-ae2c-603d13b0183d)
+<img width="1852" height="534" alt="Screenshot 2025-12-31 020247" src="https://github.com/user-attachments/assets/80fc668d-e941-4852-ac11-15749a87b57d" />
 
+# ⭐ Main & Welcome page (Mobile)
+<img width="392" height="853" alt="Screenshot 2025-12-31 020348" src="https://github.com/user-attachments/assets/66f6b4a5-9cb0-42f6-92cb-5cffb3ac81e1" />
 
-
+# ⏲️ Timer & Tasks (Mobile)
+<img width="391" height="654" alt="Screenshot 2025-12-31 020356" src="https://github.com/user-attachments/assets/9d9ed93b-b96e-4359-8a11-a4d019a84ee8" />
 
 # 🗨️ RU
 Всем привет! Это мой первый гитхаб репозиторий для такого проекта.
