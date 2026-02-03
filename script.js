@@ -80,6 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const completionSound = document.getElementById('completionSound');
+    completionSound.volume = 0.6; // комфортная громкость завершения
 
     let timer;
     let isRunning = false;
@@ -94,7 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const circumference = 880;
 
-    // Ключ для хранения состояния таймера
     const TIMER_STORAGE_KEY = 'pomodoroTimerState';
 
     function updateTimeDisplay() {
@@ -174,7 +174,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 clearInterval(timer);
                 isRunning = false;
                 startButton.textContent = translations[currentLanguage].start;
+
+                completionSound.currentTime = 0;
                 completionSound.play();
+
                 alert(currentLanguage === 'ru' ? 'Сессия завершена!' : 'Session completed!');
                 if (Notification.permission === 'granted') {
                     new Notification('Pomodoro', { 
@@ -220,10 +223,8 @@ document.addEventListener('DOMContentLoaded', () => {
     updateTimeDisplay();
     updateProgress();
 
-    // Загрузка состояния таймера
     loadTimerState();
 
-    // Если состояние не было загружено — устанавливаем значения по умолчанию
     if (!localStorage.getItem(TIMER_STORAGE_KEY)) {
         sessionLengthInput.value = 25;
         setTimer(25);
