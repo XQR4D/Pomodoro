@@ -80,12 +80,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const completionSound = document.getElementById('completionSound');
-    completionSound.volume = 0.6; // комфортная громкость завершения
+    completionSound.volume = 0.6;
 
     let timer;
     let isRunning = false;
     let timeLeft = 25 * 60;
     let totalTime = timeLeft;
+    let startTime = 0; // момент запуска/возобновления сессии
 
     const timeDisplay = document.getElementById('time');
     const progressCircle = document.querySelector('.progress-ring__circle');
@@ -154,6 +155,8 @@ document.addEventListener('DOMContentLoaded', () => {
         sessionLengthInput.value = minutes;
         timeLeft = minutes * 60;
         totalTime = timeLeft;
+        startTime = 0;
+        isRunning = false;
         updateTimeDisplay();
         updateProgress();
         saveTimerState();
@@ -161,18 +164,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startTimerInternal() {
         isRunning = true;
+        startTime = Date.now();
         startButton.textContent = currentLanguage === 'ru' ? 'Пауза' : 'Pause';
         saveTimerState();
 
         timer = setInterval(() => {
-            if (timeLeft > 0) {
-                timeLeft--;
-                updateTimeDisplay();
-                updateProgress();
-                saveTimerState();
-            } else {
+            const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+            timeLeft = totalTime - elapsedSeconds;
+
+            if (timeLeft <= 0) {
+                timeLeft = 0;
                 clearInterval(timer);
                 isRunning = false;
+                startTime = 0;
                 startButton.textContent = translations[currentLanguage].start;
 
                 completionSound.currentTime = 0;
@@ -186,14 +190,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 clearTimerState();
             }
+
+            updateTimeDisplay();
+            updateProgress();
+            saveTimerState();
         }, 1000);
     }
 
     function togglePause() {
         if (isRunning) {
             clearInterval(timer);
+            const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+            timeLeft = totalTime - elapsedSeconds;
+            if (timeLeft < 0) timeLeft = 0;
+            startTime = 0;
             isRunning = false;
             startButton.textContent = translations[currentLanguage].start;
+            updateTimeDisplay();
+            updateProgress();
             saveTimerState();
         } else {
             startTimerInternal();
@@ -203,6 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetTimer() {
         clearInterval(timer);
         isRunning = false;
+        startTime = 0;
         startButton.textContent = translations[currentLanguage].start;
 
         const customMin = Number(sessionLengthInput.value);
