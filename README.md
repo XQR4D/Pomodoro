@@ -10,18 +10,7 @@
 # ⏲️ Timer & Tasks (Mobile)
 <img width="391" height="654" alt="Screenshot 2025-12-31 020356" src="https://github.com/user-attachments/assets/9d9ed93b-b96e-4359-8a11-a4d019a84ee8" />
 
-# 🗨️ RU
-Всем привет! Это мой первый гитхаб репозиторий для такого проекта.
-
-Мой проект предназначен для методики pomodoro, на сайте есть добавление задач, выставление таймера на предложенные вариации, а так же выбор своей вариации.
-Вы также можете изменить вторую часть страницы на что угодно, был бы ли это цвет или картинка, не важно.
-
-На сайте присутствует автоперевод на добавленные языки, пока что это EN и RU, если у вас есть идея по добавлению новых языков, или вы хотите помочь с переводом, то напишите в issues выбрав шаблон features.
-Задачи и язык сохраняются при перезагрузке страницы.
-
-Хорошей вам продуктивности!
-
-# 🗨️ EN
+# EN
 Hi everyone, this is my first github repository for a project like this.
 
 My project is for the pomodoro methodology, on the site there is adding tasks, setting a timer on the suggested variations, and also choosing your own variation.
